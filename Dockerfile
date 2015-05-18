@@ -3,16 +3,17 @@ FROM gliderlabs/alpine:3.1
 MAINTAINER Kevin van der Vlist <kvdvlist@sogyo.nl>
 
 RUN apk update \
-  && apk add wget \
+  && apk add wget go git gcc libgcc musl-dev \
+  && GOPATH=/go go get github.com/hashicorp/consul \
+  && cd /bin \
+  && GOPATH=/go go build github.com/hashicorp/consul \
+  && rm -rf /go \
   && cd /tmp \
-  && wget --no-check-certificate -O consul.zip https://dl.bintray.com/mitchellh/consul/0.5.1_linux_amd64.zip \
   && wget --no-check-certificate -O ui.zip https://dl.bintray.com/mitchellh/consul/0.5.1_web_ui.zip \
-  && unzip consul.zip \
   && unzip ui.zip \
-  && mv consul /bin/consul \
   && mv dist /ui \
   && rm ui.zip \
-  && apk del wget \
+  && apk del wget go git gcc libgcc musl-dev \
   && rm -rf /var/cache/apk/*
 
 ENV GOMAXPROCS 2
